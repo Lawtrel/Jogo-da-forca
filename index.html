@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>Jogo da Forca</title>
+</head>
+<body>
+    <img src="./img/logo.png" alt="Logo da Alura" class="logo">
+    <div id="div-desaparece" class="botoes-home">
+        <a href="#forca">
+            <input class="btn-iniciar" type="submit" value="iniciar o jogo" id="iniciar-jogo" onclick="iniciarJogo()">
+        </a>
+    </div>
+    <div id="div-aparece-forca" class="canvas">
+        <div class = "sublinado">
+            <canvas id="forca" height="860px" width="1200px"></canvas>
+
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="./js/script.js"></script>
+</html>
