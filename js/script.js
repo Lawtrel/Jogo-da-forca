@@ -1,9 +1,9 @@
 let tela =document.querySelector("canvas");
 let tabuleiro = document.getElementById("forca").getContext('2d');
 
-let btnNovoJogoinv = document.getElementById("btn-jogo").style.display = "nome"
+let btnNovoJogoinv = document.getElementById("btn-novo-jogo").style.display = "none"
 let btnSairInv = document.getElementById("btn-sair").style.display = "nome"
-let btnAdicionarPalavra = document.getElementById("btn-adicionar").style.display = "nome"
+let btnAdicionarPalavra = document.getElementById("adicionar-palavra").style.display = "nome"
 let btnNovoJogo = document.getElementById("btn-novo-jogo");
 let btnSair = document.getElementById("btn-sair");
 let btnCancelar = document.getElementById("btn-cancelar");
@@ -41,56 +41,117 @@ function escolherPalavraSecreta(){
     let palavra = palavras[Math.floor(Math.random() * palavras.length)]
     palavraSecretas = palavra
     return palavra
-    console.log(palavraSecretas)
 }
 
-function verificarLetra(key){
-    let estado = false
-    if(key >= 65 && letras.indexOf(key) || key <= 90 && letras.indexOf(key)){
+function verificarLetraClicada(key){
+    if(letras.length < 1 || letras.indexOf(key) < 0){
         letras.push(key)
-        console.log(key)
-        console.log(letras)
-        return estado
+        return false
     }
     else{
-        estado = true
         letras.push(key)
-        console.log(key)
-        console.log(letras, "if true")
-        return estado
+        return true
     }
 }
 
-function adicionarLetraIncorreta(){
-    erros -= 1
-    console.log(erros)
+function adicionarLetraCorreta(i) {
+    palavraCorreta += palavraSecretas[i].toUpperCase()
+}
+
+function adicionarLetraIncorreta(letter){
+    if (palavraSecretas.indexOf(letter) <= 0) {
+        erros -= 1
+    }
+}
+
+function verificarFimdeJogo(letra) {
+    if (letraEscolhida.length < palavraSecretas.length) {
+        letrasincorretas.push(letra);
+    
+    if (letrasincorretas.length > numerosDeErros) {
+        exibirDerrota()
+    }
+    else if (letraEscolhida.length < palavraSecretas.length) {
+        adicionarLetraIncorreta(letra)
+        escreverLetraIncorreta(letra, erros)
+        }
+    }
+}
+
+function verificarVencedor(letra) {
+    letraEscolhida.push(letra.toUpperCase());
+    if (letraEscolhida.length == palavraSecretas.length) {
+    exibirVitoria()
+    }
+}
+
+function verificarLetra(keyCode) {
+    if (typeof keyCode === "number" && keyCode >= 65 && keyCode <= 90) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+function mostrarTelaAdicionarPalavra() {
+    document.getElementById("div-desaparece").style.display = 'none';
+    document.getElementById("adicionar-palavra").style.display = "block";
+  
+}
+
+function salvarPalavra() {
+    let novaPalara = document.getElementById('input-nova-palavra').value;
+    
+    if(novaPalara !==""){
+        palavras.push(novaPalara.toUpperCase());
+        alert('Palavra digitada foi salva com sucesso')
+        document.getElementById("adicionar-palavra").style.display = "none";
+        iniciarJogo();
+    }
+    else{
+        alert("Nenhuma palavra foi digitada")
+    }
 }
 
 function iniciarJogo(){
     document.getElementById('div-desaparece').style.display = "none"
-    escolherPalavraSecreta()
-
     desenharCanvas()
+    escolherPalavraSecreta()
     desenharLinhas()
+
+    document.getElementById("btn-novo-jogo").style.display = "block"
+    document.getElementById("btn-sair").style.display = "block"
 
     document.onkeydown = (e) => {
 
         let letra = e.key.toUpperCase()
 
-        if (verificarLetra(letra) && palavraSecretas.includes(letra)){
-            for(let i = 0; i < palavraSecretas.length; i++){
-                if(palavraSecretas[i] === letra){
+        if (letrasincorretas.length <= numerosDeErros) {
+            if (!verificarLetraClicada(e.key) && verificarLetra(e.keyCode)) {
+              if (palavraSecretas.includes(letra)) {
+                adicionarLetraCorreta(palavraSecretas.indexOf(letra))
+                for (let i = 0; i < palavraSecretas.length; i++) {
+                  if (palavraSecretas[i] === letra) {
                     escreverLetraCorreta(i)
+                    verificarVencedor(letra)
+      
+                  }
                 }
-            }
+      
         }
         else{
-            adicionarLetraIncorreta(letra)
-            escreverLetraCorreta(letra, erros)
+            if (!verificarLetraClicada(e.key) && !verificarVencedor(letra)) return
+            desenharForca(erros)
+            verificarFimdeJogo(letra)
+          }
         }
-        
-    }
-}
+      }
+      else {
+        alert('Você atingiu o limíte de letras incorretas')
+      }
+  
+    };
+  }
 
 function desenharCanvas(){
     tabuleiro.lineWidth = 8;
